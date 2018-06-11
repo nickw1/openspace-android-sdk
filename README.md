@@ -1,6 +1,15 @@
 OS OpenSpace Android SDK
--------
+=======
 
+PLEASE NOTE - this is a FORK of the original OS OpenSpace Android SDK available at https://github.com/OrdnanceSurvey/openspace-android-sdk. It was forked on 11/6/18 by Nick Whitelegg (nickw on OSM). The aim is to produce an SDK that will work with custom tileservers using the OSGB projection, for example a custom VectorMap District tileserver.
+
+This fork contains an Android Studio library project and produces an AAR file, so should be easy to integrate with contemporary Android Studio projects.
+
+To summarise the initial changes.
+* Several classes and methods have been made public to allow a custom tileserver to use. Please see comments in the source files.
+
+Original documentation
+-------
 The openspace-android-sdk enables access to [Ordnance Survey](http://www.ordnancesurvey.co.uk/oswebsite/web-services/) Web Map Tile Services (WMTS) for Android devices. It provides access to a number of mapping layers and gazetteer lookups and has a similar API to Google Maps API v2, so that moving from Google mapping to Ordnance Survey mapping is simple, see [Converting](#converting-google-maps).
 
 This SDK is available as a static framework, see the [Getting started](#getting-started) guide for instructions about downloading and importing into your own application or try a [demo app](#demo-projects) to get started quickly.

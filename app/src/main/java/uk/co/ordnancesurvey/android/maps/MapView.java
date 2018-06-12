@@ -184,7 +184,7 @@ public final class MapView extends FrameLayout {
 	// NW 120618 added
 	// this will be the smallest lat/lon rectangle which contains the current view, due to the
 	// differing projection it will not exactly represent what's on the screen (it will be bigger)
-	public void getLonLatBounds(double[] lonLats) {
+	public void getLatLonBounds(double[] latLons) {
 		GridRect grBounds = getBounds();
 		MapProjection proj = MapProjection.getDefault();
 		GridPoint[] points = new GridPoint[4];
@@ -196,9 +196,9 @@ public final class MapView extends FrameLayout {
 		for(int i=0; i<4; i++) {
 			proj.fromGridPoint(points[i], llPoints[i]);
 		}
-		lonLats[0] = llPoints[0][0] < llPoints[3][0] ? llPoints[0][0] : llPoints[3][0];
-		lonLats[1] = llPoints[0][1] < llPoints[1][1] ? llPoints[0][1] : llPoints[1][1];
-		lonLats[2] = llPoints[2][0] > llPoints[1][0] ? llPoints[2][0] : llPoints[1][0];
-		lonLats[3] = llPoints[2][1] > llPoints[3][1] ? llPoints[2][1] : llPoints[3][1];
+		latLons[0] = llPoints[0][0] < llPoints[3][0] ? llPoints[0][0] : llPoints[3][0];
+		latLons[1] = llPoints[0][1] < llPoints[1][1] ? llPoints[0][1] : llPoints[1][1];
+		latLons[2] = llPoints[2][0] > llPoints[1][0] ? llPoints[2][0] : llPoints[1][0];
+		latLons[3] = llPoints[2][1] > llPoints[3][1] ? llPoints[2][1] : llPoints[3][1];
 	}
 }

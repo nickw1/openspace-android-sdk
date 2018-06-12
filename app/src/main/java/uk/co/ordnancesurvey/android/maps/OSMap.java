@@ -24,6 +24,7 @@
  *
  *  Amendments NW 120618
  *  - added getScale() and getCenter() methods
+ *  - added latLonsToGridPoints()
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -369,5 +370,10 @@ public interface OSMap {
 
 	// NW 120618 added
 	public GridPoint getCenter();
+
+    // NW 120618 added
+    // This is placed here because it's most likely to be the map object that would contain
+    // the projection, should we wish to adapt the code to handle other projections.
+    public GridPoint[] latLonsToGridPoints (double[] latLons);
 }
 

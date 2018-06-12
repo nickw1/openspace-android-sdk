@@ -24,7 +24,8 @@
  *
  *  * Changes Nick Whitelegg (NW) 120618 :
  *  - get zoom level in metres per pixel with getScale().
- *  - added ngetCenter() method
+ *  - added getCenter() method
+ *  - added latLonsToGridPoints()
  */
 package uk.co.ordnancesurvey.android.maps;
 import java.io.File;
@@ -1695,6 +1696,19 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 	// NW 120618 added
     public GridPoint getCenter() {
 	    return mScrollController.getCenter();
+    }
+
+
+    // NW 120618 added
+    // This is placed here because it's most likely to be the map object that would contain
+    // the projection, should we wish to adapt the code to handle other projections.
+    public GridPoint[] latLonsToGridPoints (double[] latLons){
+	    MapProjection proj = MapProjection.getDefault();
+	    GridPoint[] gridPoints = new GridPoint[latLons.length/2];
+	    for(int i=0; i<gridPoints.length; i++) {
+	        gridPoints[i] = proj.toGridPoint(latLons[i*2], latLons[i*2+1]);
+        }
+        return gridPoints;
     }
 
 	/*

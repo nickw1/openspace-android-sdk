@@ -138,9 +138,9 @@ public class MapFragment extends Fragment {
 	}
 
 	// NW 120618 added
-	public boolean getLonLatBounds(double[] lonLats) {
+	public boolean getLatLonBounds(double[] lonLats) {
 		if(mMapView!=null) {
-			mMapView.getLonLatBounds(lonLats);
+			mMapView.getLatLonBounds(lonLats);
 			return true;
 		}
 		return false;

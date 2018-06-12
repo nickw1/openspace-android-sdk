@@ -21,6 +21,10 @@
  *
  *  *  Amendments Nick Whitelegg (NW) 110618
  * - made setMapLayers() public to allow addition of custom layers
+ *
+ *  * Changes Nick Whitelegg (NW) 120618 :
+ *  - get zoom level in metres per pixel with getScale().
+ *  - added ngetCenter() method
  */
 package uk.co.ordnancesurvey.android.maps;
 import java.io.File;
@@ -1681,6 +1685,18 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 		}
 		return ret;
 	}
+
+	// NW 120618 added
+	public float getScale() {
+		return mScrollController.getScale();
+	}
+
+
+	// NW 120618 added
+    public GridPoint getCenter() {
+	    return mScrollController.getCenter();
+    }
+
 	/*
 	private int leaks = 0;
 	private void leakGPUMemory() {

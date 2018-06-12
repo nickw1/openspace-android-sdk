@@ -19,6 +19,8 @@
  * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  *
+ * 120618 Nick Whitelegg (NW) added:
+ * - getBounds() and getLonLatBounds() which call the corresponding methods of the MapView
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -128,5 +130,19 @@ public class MapFragment extends Fragment {
 	 */
 	public static MapFragment newInstance(OSMapOptions options) {
 		return new MapFragment(options);
+	}
+
+	// NW 120618 added
+	public GridRect getBounds() {
+		return mMapView==null ? null : mMapView.getBounds();
+	}
+
+	// NW 120618 added
+	public boolean getLonLatBounds(double[] lonLats) {
+		if(mMapView!=null) {
+			mMapView.getLonLatBounds(lonLats);
+			return true;
+		}
+		return false;
 	}
 }

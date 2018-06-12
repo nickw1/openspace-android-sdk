@@ -19,6 +19,9 @@
  * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  *
+ * Changes Nick Whitelegg (NW) 120618
+ * - added bounds calculation methods, making use of getScale() in OSMap
+ * - made class public
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -32,7 +35,7 @@ import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 
-final class MapView extends FrameLayout {
+public final class MapView extends FrameLayout {
 	private final GLMapRenderer mMapRenderer;
 	private final OSMapPrivate mMap;
 
@@ -164,8 +167,38 @@ final class MapView extends FrameLayout {
 	/**
 	* Must be forwarded from the containing Activity/Fragment.
 	* Saving/restoring instance state is not supported yet.
+	 *
 	*/
 	public final void onSaveInstanceState(Bundle outState)
 	{
+	}
+
+	// NW 120618 added
+	public GridRect getBounds() {
+		float scale = mMap.getScale();
+		float widthM = getWidth()*scale, heightM = getHeight()*scale;
+		GridPoint gp = mMap.getCenter();
+		return new GridRect(gp.x - widthM/2, gp.y - heightM/2, gp.x + widthM/2, gp.y + widthM/2 );
+	}
+
+	// NW 120618 added
+	// this will be the smallest lat/lon rectangle which contains the current view, due to the
+	// differing projection it will not exactly represent what's on the screen (it will be bigger)
+	public void getLonLatBounds(double[] lonLats) {
+		GridRect grBounds = getBounds();
+		MapProjection proj = MapProjection.getDefault();
+		GridPoint[] points = new GridPoint[4];
+		double[][] llPoints = new double[4][2];
+		points[0] = new GridPoint(grBounds.minX, grBounds.minY);
+		points[1] = new GridPoint(grBounds.maxX, grBounds.minY);
+		points[2] = new GridPoint(grBounds.maxX, grBounds.maxY);
+		points[3] = new GridPoint(grBounds.minX, grBounds.maxY);
+		for(int i=0; i<4; i++) {
+			proj.fromGridPoint(points[i], llPoints[i]);
+		}
+		lonLats[0] = llPoints[0][0] < llPoints[3][0] ? llPoints[0][0] : llPoints[3][0];
+		lonLats[1] = llPoints[0][1] < llPoints[1][1] ? llPoints[0][1] : llPoints[1][1];
+		lonLats[2] = llPoints[2][0] > llPoints[1][0] ? llPoints[2][0] : llPoints[1][0];
+		lonLats[3] = llPoints[2][1] > llPoints[3][1] ? llPoints[2][1] : llPoints[3][1];
 	}
 }

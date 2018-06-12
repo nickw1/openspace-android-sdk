@@ -19,6 +19,8 @@
  * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  *
+ * Changes Nick Whitelegg (NW) 120618 :
+ *  - get zoom level in metres per pixel with getScale(), also getCenter()
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -496,5 +498,17 @@ final class MapScrollController extends CombinedGestureDetector {
 			assert initialZoom == getStartZoom() && finalZoom == getFinalZoom() : "Doubles should be accurate enough for f == (float)exp(log((double)f)) for positive f";
 			startScroll(STEP_INITIAL_INT, 0, STEP_FINAL_INT-STEP_INITIAL_INT, 0, duration);
 		}
+
+
 	}
+
+	// NW 120618 added - get the zoom in metres per pixel
+	public float getScale() {
+		return mScale;
+	}
+
+	// NW 120618 added
+    public GridPoint getCenter() {
+	    return new GridPoint (mX, mY);
+    }
 }

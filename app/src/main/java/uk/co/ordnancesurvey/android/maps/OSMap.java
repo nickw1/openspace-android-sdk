@@ -21,6 +21,9 @@
  *
  *  Amendments Nick Whitelegg (NW) 110618
  * -added setMapLayers() to allow addition of custom layers
+ *
+ *  Amendments NW 120618
+ *  - added getScale() and getCenter() methods
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -360,4 +363,11 @@ public interface OSMap {
 
 	// NW 110618 add to interface to allow users to add custom layers
 	public void setMapLayers(MapLayer[] layers);
+
+	// NW 120618 added
+	public float getScale();
+
+	// NW 120618 added
+	public GridPoint getCenter();
 }
+

@@ -23,6 +23,9 @@
  * - made 4-parameter constructor public to allow creation of custom map layer with user-defined pixel and metre tile sizes
  * - made whole class public to allow use of custom tile servers
  * - added getTileSizeMetres(), getTileSizePixels(), getLayerCode() and getProductCode() for the same reason
+ *
+ * Alterations NW 120618
+ * - new constructor not requiring product or layer code
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -54,6 +57,11 @@ public final class MapLayer {
 	// NW 110618 now public constructor to allow for custom layers
 	public MapLayer(String productCode, String layerCode, int tileSizePixels, float tileSizeMetres) {
 		this(productCode, layerCode, tileSizePixels, tileSizeMetres, null, null);
+	}
+
+	// NW 120618 new constructor in which product and layer code are not required (e.g. custom tile source)
+	public MapLayer(int tileSizePixels, float tileSizeMetres) {
+		this(null, null, tileSizePixels, tileSizeMetres);
 	}
 
 	static MapLayer[] layersForProductCodes(String[] productCodes) {

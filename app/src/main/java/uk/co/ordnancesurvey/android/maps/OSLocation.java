@@ -19,6 +19,10 @@
  * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  *
+ * Changes Nick Whitelegg (NW) 120618:
+ * - for now, use GPS provider, period. Was concerned about references to the 'fused location provider' API.
+ * As the intention is to use this for OSM mapping I want to be absolutely sure that only GPS is being used.
+ * This will be investigated more thoroughly later.
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -65,7 +69,8 @@ final class OSLocation implements SensorEventListener, LocationSource {
 	public OSLocation(Context context) 
 	{
 		mContext = context;
-		
+
+
 		// Restore preferences
 		SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
 	    mShowSettingsDialog =  settings.getBoolean(SETTINGS_PREF, true);
@@ -104,15 +109,24 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		mListener = listener;
 		final LocationManager lm = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
 		mLocation = null;
+
+
+		/* NW 120618 noticed that app was referring to the 'fused provider' which I think is the one
+		which relies on Google services which we definitely don't want if we want to use this
+		library for OSM surveying purposes. Just get it to use GPS provider for now, period.
+		TODO investigate this more thoroughly
+		 */
+
+		/*
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.NO_REQUIREMENT);
 		criteria.setAltitudeRequired(false);
 		criteria.setBearingRequired(false);
 		criteria.setCostAllowed(false);
 		criteria.setSpeedRequired(false);
-		
+		*/
 		boolean gps_enabled = false;
-		boolean network_enabled = false;
+		//boolean network_enabled = false;
 		
 		
 		try 
@@ -121,25 +135,23 @@ final class OSLocation implements SensorEventListener, LocationSource {
     		Log.v(TAG, "GPS enabled: " + gps_enabled);
 		}	
 		catch(Exception ex){}
-    	try
-    	{
-    		network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    		Log.v(TAG, "Network enabled: " + network_enabled);
-    	} catch(Exception ex){}
 
-    	if(!gps_enabled && !network_enabled)
+
+    	if(!gps_enabled)
 		{
-			Toast.makeText(mContext,  "Please enable a My Location source in system settings", Toast.LENGTH_LONG).show();
+			Toast.makeText(mContext,  "Please enable GPS in system settings", Toast.LENGTH_LONG).show();
 			// No point requesting updates from a non-existent provider.
 			return;
 		}
-		
-		lm.requestLocationUpdates(1,1, criteria, mLocationListener, null);
+
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, mLocationListener);
+		//lm.requestLocationUpdates(1,1, criteria, mLocationListener, null);
 		mIsCheckingLocation = true;
 
 		// Tell the user if they can improve accuracy if we were previous using GPS and Network, and now one of these
 		// has become unavailable.
-    	if((!gps_enabled || !network_enabled) && mLastWasGPSandNetwork)
+		/* 120618 remove this for now
+    	if((!gps_enabled) && mLastWasGPSandNetwork)
 		{               
 			if(mShowSettingsDialog)
 			{
@@ -147,7 +159,8 @@ final class OSLocation implements SensorEventListener, LocationSource {
 				dialog.show();
 			}
 		} 
-    	mLastWasGPSandNetwork = gps_enabled & network_enabled;
+    	mLastWasGPSandNetwork = gps_enabled;
+    	*/
     	
 	    mSensorManager = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
 	    Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -239,7 +252,8 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		}
 		return new LinearLayout(mContext, null);
 	}
-	
+
+	/* NW 120618 remove this for now
 	public Dialog createDialog() {
 			LinearLayout layout = createDialogLinearLayout();
 			layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -279,7 +293,7 @@ final class OSLocation implements SensorEventListener, LocationSource {
 	        // Create the AlertDialog object and return it
 	        return builder.create();
 	    }
-	     
+
 	    private void doNotShowAgain() {
 	    	mShowSettingsDialog = false;
 			// Restore preferences
@@ -288,5 +302,6 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		    editor.putBoolean(SETTINGS_PREF, false);
 		    editor.commit();
 	    }
+	    */
 
 }

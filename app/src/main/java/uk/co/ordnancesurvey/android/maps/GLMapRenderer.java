@@ -68,6 +68,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
@@ -1702,11 +1703,12 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
     // NW 120618 added
     // This is placed here because it's most likely to be the map object that would contain
     // the projection, should we wish to adapt the code to handle other projections.
-    public GridPoint[] latLonsToGridPoints (double[] latLons){
+    // NW 130618 updated to return a List
+    public List<GridPoint> latLonsToGridPoints (double[] latLons){
+	    ArrayList<GridPoint> gridPoints = new ArrayList<>();
 	    MapProjection proj = MapProjection.getDefault();
-	    GridPoint[] gridPoints = new GridPoint[latLons.length/2];
-	    for(int i=0; i<gridPoints.length; i++) {
-	        gridPoints[i] = proj.toGridPoint(latLons[i*2], latLons[i*2+1]);
+	    for(int i=0; i<latLons.length; i++) {
+	        gridPoints.add(proj.toGridPoint(latLons[i*2], latLons[i*2+1]));
         }
         return gridPoints;
     }

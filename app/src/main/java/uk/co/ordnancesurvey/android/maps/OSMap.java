@@ -30,6 +30,7 @@ package uk.co.ordnancesurvey.android.maps;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 
 import android.content.Context;
 import android.location.Location;
@@ -372,8 +373,9 @@ public interface OSMap {
 	public GridPoint getCenter();
 
     // NW 120618 added
+	// NW 130618 updated to use List
     // This is placed here because it's most likely to be the map object that would contain
     // the projection, should we wish to adapt the code to handle other projections.
-    public GridPoint[] latLonsToGridPoints (double[] latLons);
+    public List<GridPoint> latLonsToGridPoints (double[] latLons);
 }
 

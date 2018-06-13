@@ -1705,10 +1705,13 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
     // the projection, should we wish to adapt the code to handle other projections.
     // NW 130618 updated to return a List
     public List<GridPoint> latLonsToGridPoints (double[] latLons){
+	    if(latLons.length % 2 ==1) {
+	        throw new IllegalArgumentException("latLons should contain an even number of values");
+        }
 	    ArrayList<GridPoint> gridPoints = new ArrayList<>();
 	    MapProjection proj = MapProjection.getDefault();
-	    for(int i=0; i<latLons.length; i++) {
-	        gridPoints.add(proj.toGridPoint(latLons[i*2], latLons[i*2+1]));
+	    for(int i=0; i<latLons.length; i+=2) {
+	        gridPoints.add(proj.toGridPoint(latLons[i], latLons[i+1]));
         }
         return gridPoints;
     }

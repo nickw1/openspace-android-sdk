@@ -23,6 +23,8 @@
  * - for now, use GPS provider, period. Was concerned about references to the 'fused location provider' API.
  * As the intention is to use this for OSM mapping I want to be absolutely sure that only GPS is being used.
  * This will be investigated more thoroughly later.
+ *
+ * 140618 put some of the old location stuff back but still comment out the Criteria-based request for now
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -92,8 +94,10 @@ final class OSLocation implements SensorEventListener, LocationSource {
 			// Show settings dialog?
 		}
 		public void onProviderEnabled(String provider) {
+
 		}
 		public void onStatusChanged(String provider, int status, Bundle extras) {
+
 		}
 	};
 	
@@ -125,8 +129,9 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		criteria.setCostAllowed(false);
 		criteria.setSpeedRequired(false);
 		*/
+
 		boolean gps_enabled = false;
-		//boolean network_enabled = false;
+		boolean network_enabled = false;
 		
 		
 		try 
@@ -135,32 +140,47 @@ final class OSLocation implements SensorEventListener, LocationSource {
     		Log.v(TAG, "GPS enabled: " + gps_enabled);
 		}	
 		catch(Exception ex){}
-
-
-    	if(!gps_enabled)
+		try
 		{
-			Toast.makeText(mContext,  "Please enable GPS in system settings", Toast.LENGTH_LONG).show();
+			network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+			Log.v(TAG, "Network enabled: " + gps_enabled);
+		}
+		catch(Exception ex){}
+
+    	if(!gps_enabled && !network_enabled)
+		{
+			Toast.makeText(mContext,  "Please enable location in system settings", Toast.LENGTH_LONG).show();
 			// No point requesting updates from a non-existent provider.
 			return;
 		}
 
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, mLocationListener);
-		//lm.requestLocationUpdates(1,1, criteria, mLocationListener, null);
+		lm.requestLocationUpdates(gps_enabled? LocationManager.GPS_PROVIDER: LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
+		//lm.requestLocationUpdates(0,0, criteria, mLocationListener, null);
+		if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			Log.v(TAG,  "We are using GPS location");
+		}
+		else if(lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+			Log.v(TAG,  "We are using network location");
+		}
+		else if (gps_enabled || network_enabled) {
+			Log.v(TAG, "WARNING!!! Not using GPS or network provider!!! This might not be allowed in OSM!!!");
+		}
 		mIsCheckingLocation = true;
 
 		// Tell the user if they can improve accuracy if we were previous using GPS and Network, and now one of these
 		// has become unavailable.
-		/* 120618 remove this for now
-    	if((!gps_enabled) && mLastWasGPSandNetwork)
+
+    	if((!gps_enabled || !network_enabled) && mLastWasGPSandNetwork)
 		{               
 			if(mShowSettingsDialog)
 			{
 				Dialog dialog = createDialog();
 				dialog.show();
 			}
-		} 
-    	mLastWasGPSandNetwork = gps_enabled;
-    	*/
+		}
+
+    	mLastWasGPSandNetwork = gps_enabled & network_enabled;
+
     	
 	    mSensorManager = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
 	    Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -253,7 +273,7 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		return new LinearLayout(mContext, null);
 	}
 
-	/* NW 120618 remove this for now
+
 	public Dialog createDialog() {
 			LinearLayout layout = createDialogLinearLayout();
 			layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -302,6 +322,4 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		    editor.putBoolean(SETTINGS_PREF, false);
 		    editor.commit();
 	    }
-	    */
-
 }

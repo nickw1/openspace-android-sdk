@@ -490,6 +490,7 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 		
 		if(mMyLocationEnabled)
 		{
+			Log.v(TAG, "activated GPS");
 			mLocationSource.activate(this);
 			mMyLocationEnabled = mLocationSource.isCheckingLocation();
 		}

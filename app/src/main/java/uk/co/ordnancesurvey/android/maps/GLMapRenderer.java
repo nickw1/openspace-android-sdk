@@ -30,6 +30,7 @@
  *  Changes NW 140618:
  *  - added map projection as an attribute, along with setter and getter. That way we can
  *  use a different projection if we want. Set it to OSGB projection by default.
+ *  - remove toast with assertion info
  */
 package uk.co.ordnancesurvey.android.maps;
 import java.io.File;
@@ -104,7 +105,8 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 			} else {
 				String s = "Assertions are disabled! To enable them, run \"adb shell setprop debug.assert 1\" and reinstall app";
 				Log.w(TAG, s);
-				Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+				// NW 140618 remove this toast as it gets in the way a bit
+				// Toast.makeText(context, s, Toast.LENGTH_LONG).show();
 				// Sanity check that we have the test the right way around.
 				assert false;
 			}

@@ -21,6 +21,9 @@
  *
  * Changes Nick Whitelegg (NW) 120618 :
  *  - get zoom level in metres per pixel with getScale(), also getCenter()
+ *
+ * Changes NW 140618:
+ *  - remove activity.setTitle() call with fps etc, as we might want our own title
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -413,7 +416,8 @@ final class MapScrollController extends CombinedGestureDetector {
 				@Override
 				public void run() {
 					String stats = String.format(Locale.ENGLISH, "%.3g fps, %.3g ms (rms)", fps, rmslatency);
-					activity.setTitle(stats);
+					// NW 140618 remove - we might want a different title for our activity
+				//	activity.setTitle(stats);
 					Log.v(TAG, stats);
 				}
 			});

@@ -377,5 +377,11 @@ public interface OSMap {
     // This is placed here because it's most likely to be the map object that would contain
     // the projection, should we wish to adapt the code to handle other projections.
     public List<GridPoint> latLonsToGridPoints (double[] latLons);
+
+    // NW 140618 added
+	public void setMapProjection(MapProjection proj);
+
+	// NW 140618 added
+	public MapProjection getMapProjection();
 }
 

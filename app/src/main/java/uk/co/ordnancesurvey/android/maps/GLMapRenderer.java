@@ -19,13 +19,17 @@
  * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  *
- *  *  Amendments Nick Whitelegg (NW) 110618
+ *  Amendments Nick Whitelegg (NW) 110618
  * - made setMapLayers() public to allow addition of custom layers
  *
- *  * Changes Nick Whitelegg (NW) 120618 :
+ *  Changes Nick Whitelegg (NW) 120618 :
  *  - get zoom level in metres per pixel with getScale().
  *  - added getCenter() method
  *  - added latLonsToGridPoints()
+ *
+ *  Changes NW 140618:
+ *  - added map projection as an attribute, along with setter and getter. That way we can
+ *  use a different projection if we want. Set it to OSGB projection by default.
  */
 package uk.co.ordnancesurvey.android.maps;
 import java.io.File;
@@ -243,6 +247,9 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 	private double lastx;
 	private double lasty;
 	private float lastMPP;
+
+	// NW 140618 added to allow the map projection to be potentially reset
+    MapProjection proj = MapProjection.getDefault();
 	
 	// Maintain a dirty area for drawing fallbacks. We'll implement this as a simple rect for the moment
 	private class DirtyArea 
@@ -431,7 +438,8 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 		}
 		
 		// Need to convert the WGS84 Lat/Long to an actual grid ref.
-		MapProjection proj = MapProjection.getDefault();
+        // NW 140618 this is now an attribute so we can change it if we want
+		//MapProjection proj = MapProjection.getDefault();
 		mCurrentLocation = new Location(location);
 		mCurrentGridPoint = proj.toGridPoint(location.getLatitude(), location.getLongitude());
 		
@@ -1709,11 +1717,21 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 	        throw new IllegalArgumentException("latLons should contain an even number of values");
         }
 	    ArrayList<GridPoint> gridPoints = new ArrayList<>();
-	    MapProjection proj = MapProjection.getDefault();
+
 	    for(int i=0; i<latLons.length; i+=2) {
 	        gridPoints.add(proj.toGridPoint(latLons[i], latLons[i+1]));
         }
         return gridPoints;
+    }
+
+    // NW 140618 added
+    public void setMapProjection(MapProjection proj) {
+	    this.proj = proj;
+    }
+
+    // NW 140618 added
+    public MapProjection getMapProjection() {
+	    return proj;
     }
 
 	/*

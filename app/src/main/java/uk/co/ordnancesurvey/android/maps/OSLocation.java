@@ -26,6 +26,7 @@
  *
  * 140618 put some of the old location stuff back but still comment out the Criteria-based request for now
  * 190618 change minTime and minDistance to something sensible for GPS surveying
+ * 190618 remove onLocationChanged() call on sensor change
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -156,6 +157,7 @@ final class OSLocation implements SensorEventListener, LocationSource {
 		}
 
 		// NW 190618 change minTime and minDistance parameters to something sensible for GPS surveying
+		Log.v(TAG, "Requesting location updates!!!");
 		lm.requestLocationUpdates(gps_enabled? LocationManager.GPS_PROVIDER: LocationManager.NETWORK_PROVIDER, 2000, 5, mLocationListener);
 		//lm.requestLocationUpdates(0,0, criteria, mLocationListener, null);
 		if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -257,7 +259,8 @@ final class OSLocation implements SensorEventListener, LocationSource {
 			{
 				if(mListener != null)
 				{
-					mListener.onLocationChanged(mLocation);
+					// NW 190618 we don't want this!!! Otherwise we end up with a continuous location update every time sensors change!!!
+					//mListener.onLocationChanged(mLocation);
 				}
 			}
 		}

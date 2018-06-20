@@ -25,6 +25,7 @@
  * This will be investigated more thoroughly later.
  *
  * 140618 put some of the old location stuff back but still comment out the Criteria-based request for now
+ * 190618 change minTime and minDistance to something sensible for GPS surveying
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -154,7 +155,8 @@ final class OSLocation implements SensorEventListener, LocationSource {
 			return;
 		}
 
-		lm.requestLocationUpdates(gps_enabled? LocationManager.GPS_PROVIDER: LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
+		// NW 190618 change minTime and minDistance parameters to something sensible for GPS surveying
+		lm.requestLocationUpdates(gps_enabled? LocationManager.GPS_PROVIDER: LocationManager.NETWORK_PROVIDER, 2000, 5, mLocationListener);
 		//lm.requestLocationUpdates(0,0, criteria, mLocationListener, null);
 		if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			Log.v(TAG,  "We are using GPS location");

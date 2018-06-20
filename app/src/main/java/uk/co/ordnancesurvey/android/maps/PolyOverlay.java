@@ -19,6 +19,8 @@
  * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  *
+ * Changes Nick Whitelegg (NW) 190618
+ * - null check on polyData in glDrawPoints() as crash can happen on rewind() call if you try to access polyline directly with no points yet
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -195,143 +197,139 @@ abstract class PolyOverlay extends ShapeOverlay {
 		}
 		
 		FloatBuffer polyData = points.mAdditionalData;
-		
-		
-		int numPoints = points.mVertexCount;
-		
-		// Offset to triangles.
-		int toff = numPoints * 2;
-		float lineWidthM = getStrokeWidth() / 2;
-		if(!mPixelCoordinates)
-		{
-			lineWidthM *= metresPerPixel;
-		}
 
-		polyData.rewind();
-		// Write an additional pair of points for a closed line.
-		int writePoints = numPoints;
-		if(mClosed)
-		{
-			writePoints++;
-		}
-		int vertexStep = 22;
-		for(int i = 0; (i+1) < writePoints; i++)
-		{		
-			// Get point A (index i)
-			// Not good - we need to synchronize the read of points with the read of polydata.
-			float ax = points.mVertexBuffer.get((i % numPoints)*2);
-			float ay = points.mVertexBuffer.get((i % numPoints)*2+1);
+		if(polyData!=null) { // NW prevent crash
 
-			// Get Point B (index i + 1)
-			float bx = points.mVertexBuffer.get(((i+1) % numPoints)*2);
-			float by = points.mVertexBuffer.get(((i+1) % numPoints)*2+1);
-			
-			// Normal to vector A->B
-			float nabx = polyData.get((i % numPoints) * 2);
-			float naby = polyData.get((i % numPoints) * 2 + 1);
-			
-			// Normal to vector B->C (where C is index i + 2)
-			float nbcx = polyData.get(((i+1) % numPoints) * 2);
-			float nbcy = polyData.get(((i+1) % numPoints) * 2 + 1);
-			
-			// Compute the normalised B->C vector by going CCW PI/2 from its normal
-			// Used in dot product to determine which way we are turning at this corner
-			float bcx = -nbcy;
-			float bcy = nbcx;
-			
-			// Compute the vertices for the end cap "fill" triangle for this corner
-			// This depends on whether we are turning CCW or CW
-			float c1x, c1y, c2x, c2y, c3x, c3y;
-			if ( bcx * nabx + bcy * naby < 0)
-			{
-				// ab -> bc is turning CCW
-				c1x = bx;
-				c1y = by;
-				c2x = (float)(bx + nabx * lineWidthM);
-				c2y = (float)(by + naby * lineWidthM);
-				c3x = (float)(bx + nbcx * lineWidthM);
-				c3y = (float)(by + nbcy * lineWidthM);
+			int numPoints = points.mVertexCount;
+
+			// Offset to triangles.
+			int toff = numPoints * 2;
+			float lineWidthM = getStrokeWidth() / 2;
+			if (!mPixelCoordinates) {
+				lineWidthM *= metresPerPixel;
 			}
-			else
-			{
-				// ab -> bc is turning CW
-				c1x = bx;
-				c1y = by;
-				c2x = (float)(bx - nabx * lineWidthM);
-				c2y = (float)(by - naby * lineWidthM);
-				c3x = (float)(bx - nbcx * lineWidthM);
-				c3y = (float)(by - nbcy * lineWidthM);
+
+			polyData.rewind();
+			// Write an additional pair of points for a closed line.
+			int writePoints = numPoints;
+			if (mClosed) {
+				writePoints++;
 			}
-			
-			
+			int vertexStep = 22;
+			for (int i = 0; (i + 1) < writePoints; i++) {
+				// Get point A (index i)
+				// Not good - we need to synchronize the read of points with the read of polydata.
+				float ax = points.mVertexBuffer.get((i % numPoints) * 2);
+				float ay = points.mVertexBuffer.get((i % numPoints) * 2 + 1);
+
+				// Get Point B (index i + 1)
+				float bx = points.mVertexBuffer.get(((i + 1) % numPoints) * 2);
+				float by = points.mVertexBuffer.get(((i + 1) % numPoints) * 2 + 1);
+
+				// Normal to vector A->B
+				float nabx = polyData.get((i % numPoints) * 2);
+				float naby = polyData.get((i % numPoints) * 2 + 1);
+
+				// Normal to vector B->C (where C is index i + 2)
+				float nbcx = polyData.get(((i + 1) % numPoints) * 2);
+				float nbcy = polyData.get(((i + 1) % numPoints) * 2 + 1);
+
+				// Compute the normalised B->C vector by going CCW PI/2 from its normal
+				// Used in dot product to determine which way we are turning at this corner
+				float bcx = -nbcy;
+				float bcy = nbcx;
+
+				// Compute the vertices for the end cap "fill" triangle for this corner
+				// This depends on whether we are turning CCW or CW
+				float c1x, c1y, c2x, c2y, c3x, c3y;
+				if (bcx * nabx + bcy * naby < 0) {
+					// ab -> bc is turning CCW
+					c1x = bx;
+					c1y = by;
+					c2x = (float) (bx + nabx * lineWidthM);
+					c2y = (float) (by + naby * lineWidthM);
+					c3x = (float) (bx + nbcx * lineWidthM);
+					c3y = (float) (by + nbcy * lineWidthM);
+				} else {
+					// ab -> bc is turning CW
+					c1x = bx;
+					c1y = by;
+					c2x = (float) (bx - nabx * lineWidthM);
+					c2y = (float) (by - naby * lineWidthM);
+					c3x = (float) (bx - nbcx * lineWidthM);
+					c3y = (float) (by - nbcy * lineWidthM);
+				}
+
+
 //			Log.v("Render", "Original " + ax + "," + ay);
 //			Log.v("Render", "Normal " + nx + "," + ny);
 
-			// The line segment itself
-			float p1x =  (float)(ax + nabx * lineWidthM);
-			float p1y =  (float)(ay + naby * lineWidthM);
-			float p2x =  (float)(ax - nabx * lineWidthM);
-			float p2y =  (float)(ay - naby * lineWidthM);
-			float p3x =  (float)(bx + nabx * lineWidthM);
-			float p3y =  (float)(by + naby * lineWidthM);
-			float p4x =  (float)(bx - nabx * lineWidthM);
-			float p4y =  (float)(by - naby * lineWidthM);
-			
-			// The corner filling triangle two null triangle groups
-			float p5x =  p4x; // Repeat p4 to terminate that triangle
-			float p5y =  p4y;
-			float p6x =  c1x; // Repeat c1 twice to prevent an incipient triangle
-			float p6y =  c1y;
-			float p7x =  c1x;
-			float p7y =  c1y; 
-			float p8x =  c2x;
-			float p8y =  c2y;
-			float p9x =  c3x;
-			float p9y =  c3y;
-			float p10x =  c3x; // Repeat c3 to terminate triangle 
-			float p10y =  c3y;
-			float p11x =  (float)(bx + nbcx * lineWidthM); // Next triangle will start with this, so pre-fill it
-			float p11y =  (float)(by + nbcy * lineWidthM);
-			
+				// The line segment itself
+				float p1x = (float) (ax + nabx * lineWidthM);
+				float p1y = (float) (ay + naby * lineWidthM);
+				float p2x = (float) (ax - nabx * lineWidthM);
+				float p2y = (float) (ay - naby * lineWidthM);
+				float p3x = (float) (bx + nabx * lineWidthM);
+				float p3y = (float) (by + naby * lineWidthM);
+				float p4x = (float) (bx - nabx * lineWidthM);
+				float p4y = (float) (by - naby * lineWidthM);
+
+				// The corner filling triangle two null triangle groups
+				float p5x = p4x; // Repeat p4 to terminate that triangle
+				float p5y = p4y;
+				float p6x = c1x; // Repeat c1 twice to prevent an incipient triangle
+				float p6y = c1y;
+				float p7x = c1x;
+				float p7y = c1y;
+				float p8x = c2x;
+				float p8y = c2y;
+				float p9x = c3x;
+				float p9y = c3y;
+				float p10x = c3x; // Repeat c3 to terminate triangle
+				float p10y = c3y;
+				float p11x = (float) (bx + nbcx * lineWidthM); // Next triangle will start with this, so pre-fill it
+				float p11y = (float) (by + nbcy * lineWidthM);
+
 //			Log.v("Render", "Point " + p1x + "," + p1y);
 //			Log.v("Render", "Point " + p2x + "," + p2y);
 
-			int offset = toff + i * vertexStep;
-			polyData.put(offset, p1x);
-			polyData.put(offset + 1, p1y);
-			polyData.put(offset + 2, p2x);
-			polyData.put(offset + 3, p2y);
-			polyData.put(offset + 4, p3x);
-			polyData.put(offset + 5, p3y);
-			polyData.put(offset + 6, p4x);
-			polyData.put(offset + 7, p4y);
-			polyData.put(offset + 8, p5x);
-			polyData.put(offset + 9, p5y);
-			polyData.put(offset + 10, p6x);
-			polyData.put(offset + 11, p6y);
-			polyData.put(offset + 12, p7x);
-			polyData.put(offset + 13, p7y);
-			polyData.put(offset + 14, p8x);
-			polyData.put(offset + 15, p8y);
-			polyData.put(offset + 16, p9x);
-			polyData.put(offset + 17, p9y);
-			polyData.put(offset + 18, p10x);
-			polyData.put(offset + 19, p10y);
-			polyData.put(offset + 20, p11x);
-			polyData.put(offset + 21, p11y);
+				int offset = toff + i * vertexStep;
+				polyData.put(offset, p1x);
+				polyData.put(offset + 1, p1y);
+				polyData.put(offset + 2, p2x);
+				polyData.put(offset + 3, p2y);
+				polyData.put(offset + 4, p3x);
+				polyData.put(offset + 5, p3y);
+				polyData.put(offset + 6, p4x);
+				polyData.put(offset + 7, p4y);
+				polyData.put(offset + 8, p5x);
+				polyData.put(offset + 9, p5y);
+				polyData.put(offset + 10, p6x);
+				polyData.put(offset + 11, p6y);
+				polyData.put(offset + 12, p7x);
+				polyData.put(offset + 13, p7y);
+				polyData.put(offset + 14, p8x);
+				polyData.put(offset + 15, p8y);
+				polyData.put(offset + 16, p9x);
+				polyData.put(offset + 17, p9y);
+				polyData.put(offset + 18, p10x);
+				polyData.put(offset + 19, p10y);
+				polyData.put(offset + 20, p11x);
+				polyData.put(offset + 21, p11y);
 
+			}
+
+			float strokeWidth = getStrokeWidth();
+			glLineWidth(strokeWidth);
+
+			int strokeColor = getStrokeColor();
+			Utils.setUniformPremultipliedColorARGB(shaderOverlayUniformColor, strokeColor);
+
+			polyData.position(toff);
+			glVertexAttribPointer(shaderOverlayAttribVCoord, 2, GL_FLOAT, false, 0, polyData.slice());
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, (writePoints - 1) * vertexStep / 2);
 		}
-		
-		float strokeWidth = getStrokeWidth();
-		glLineWidth(strokeWidth);
-		
-		int strokeColor = getStrokeColor();
-		Utils.setUniformPremultipliedColorARGB(shaderOverlayUniformColor, strokeColor);
-
-		polyData.position(toff);
-		glVertexAttribPointer(shaderOverlayAttribVCoord, 2, GL_FLOAT, false, 0, polyData.slice());
-
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, (writePoints-1) * vertexStep/2);
 	}
 
 	void glSetMatrix(int shaderOverlayUniformMVP, float[] orthoMatrix, float[] mvpTempMatrix, ScreenProjection projection, PolyPoints points, float metresPerPixel) {

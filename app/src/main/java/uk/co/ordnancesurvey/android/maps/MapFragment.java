@@ -72,7 +72,7 @@ public class MapFragment extends Fragment {
 		super();
 		mOptions = options;
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// This method is final to prevent other methods breaking if this class becomes non-final.

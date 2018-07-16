@@ -25,6 +25,10 @@
  *  Amendments NW 120618
  *  - added getScale() and getCenter() methods
  *  - added latLonsToGridPoints()
+ *
+ *  Amendments NW 050718
+ *  - addPolyline() taking Polyline to re-add Polyline previously removed
+ *
  */
 package uk.co.ordnancesurvey.android.maps;
 
@@ -248,7 +252,18 @@ public interface OSMap {
 	 * @return The Polyline object that was added to the map.
 	 */
 	Polyline addPolyline(PolylineOptions options);
-	
+
+	// NW 050718 added
+	// Re-add a polyline previously removed
+	/**
+	 * Adds a polyline to this map.
+	 * @param polyline	A polyline object
+	 * @return void
+	 */
+	void addPolyline(Polyline polyline);
+
+	Polyline makePolyline(PolylineOptions options);
+
 	/**
 	 * Adds a polygon to this map.
 	 * @param options A polygon options object that defines how to render the Polygon.

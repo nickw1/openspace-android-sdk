@@ -31,6 +31,9 @@
  *  - added map projection as an attribute, along with setter and getter. That way we can
  *  use a different projection if we want. Set it to OSGB projection by default.
  *  - remove toast with assertion info
+ *
+ *  Amendments NW 050718
+ *  - addPolyline() taking Polyline to re-add Polyline previously removed
  */
 package uk.co.ordnancesurvey.android.maps;
 import java.io.File;
@@ -637,6 +640,19 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 		}
 		requestRender();
 		return polyline;
+	}
+
+	// NW 050718 added to allow us to add back polylines when they have been removed
+	public final void addPolyline(Polyline polyline)
+	{
+		synchronized (mPolyOverlays) {
+			mPolyOverlays.add(polyline);
+		}
+		requestRender();
+	}
+
+	public final Polyline makePolyline(PolylineOptions polylineOptions) {
+		return new Polyline(polylineOptions, this);
 	}
 
 	@Override

@@ -30,8 +30,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import android.support.v4.util.LruCache;
 import android.util.Log;
+
+import androidx.collection.LruCache;
 
 abstract class CombinedLruCache<K> {
 	private static final String TAG = "TileCache";
@@ -121,7 +122,7 @@ abstract class CombinedLruCache<K> {
 		}
 
 	}
-	static final class TileMemoryCache<K> extends LruCache<K, byte[]>{
+	static final class TileMemoryCache<K> extends LruCache<K, byte[]> {
 		public TileMemoryCache(int maxSize) {
 			super(maxSize);
 		}

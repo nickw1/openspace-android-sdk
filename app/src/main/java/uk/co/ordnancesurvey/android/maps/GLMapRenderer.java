@@ -615,7 +615,8 @@ final class GLMapRenderer extends GLSurfaceView implements GLSurfaceView.Rendere
 		requestRender();
 		return marker;
 	}
-	
+
+
 	public void removeMarker(Marker marker)
 	{
 		mMarkersLock.writeLock().lock();

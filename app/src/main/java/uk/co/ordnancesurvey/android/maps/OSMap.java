@@ -240,7 +240,8 @@ public interface OSMap {
 	 * @return The Marker that was added to the map.
 	 */
 	public Marker addMarker(MarkerOptions options);
-	
+
+
 	/**
 	 * Removes all markers, overlays, and polylines from the map.
 	 */
